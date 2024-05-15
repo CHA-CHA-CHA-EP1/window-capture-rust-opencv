@@ -1,9 +1,17 @@
+use std::time::Instant;
+
 use opencv::{core, highgui, imgproc, prelude::*};
 use rsautogui::screen::{self};
 use image::{DynamicImage, GenericImageView};
 
 fn main() {
+
+    let mut frame_cout = 0;
+    let mut start = Instant::now();
+
     loop {
+        let frame_start = Instant::now();
+
         // Capture a screenshot
         let screenshot = screen::screenshot(0, 0, 800, 800);
         // println!("{:?}", screenshot);
@@ -23,10 +31,24 @@ fn main() {
 
         // Display the image using OpenCV's highgui
         highgui::imshow("Screenshot", &mat_bgr).unwrap();
-        let key = highgui::wait_key(30).unwrap();
+        // i want to wait less than 1ms
+        highgui::wait_key(1).unwrap();
 
-        if key == 27 {
-            break;
+        // if key == 27 {
+        //    break;
+        // }
+
+        frame_cout += 1;
+
+        let frame_end = Instant::now();
+        let frame_duration = frame_end.duration_since(frame_start);
+        let frame_duration = frame_duration.as_secs_f64();
+        println!("Frame duration: {:.2}ms", frame_duration * 1000.0);
+
+        if start.elapsed().as_secs() >= 1 {
+            println!("FPS: {}", frame_cout);
+            frame_cout = 0;
+            start = Instant::now();
         }
     }
 }
